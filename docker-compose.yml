@@ -1,0 +1,13 @@
+services:
+  docker-api:
+    container_name: web-api
+    image: vafelka/devima:v1.0
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_HTTPS_PORT=443
+      - ASPNETCORE_URLS=https://+;http://+
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=AXProduct2024
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/app/certificates/aspnetapp.pfx
+    ports:
+      - "443:443"
+
