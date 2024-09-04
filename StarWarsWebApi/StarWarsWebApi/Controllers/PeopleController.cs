@@ -22,9 +22,9 @@ namespace StarWarsWebApi.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetList([FromQuery]int page = 1, int pcsPerPage = 10)
+        public async Task<IActionResult> GetList([FromQuery] int page = 1, int pcsPerPage = 10)
         {
-           var personCoolection =  _repository.GetEntities(page, pcsPerPage);  
+            var personCoolection = _repository.GetEntities(page, pcsPerPage);
             _logger.LogInformation("Getting people from API");
             if (personCoolection == null)
             {
@@ -38,7 +38,7 @@ namespace StarWarsWebApi.Controllers
         public async Task<IActionResult> GetById(int id)
         {
             var entityFromLocalDb = await _peopleRepo.GetPeopleByIdOrDefault(id);
-            _logger.LogInformation("Is entity with id present on our db {entityFromLocalDb}",entityFromLocalDb);
+            _logger.LogInformation("Is entity with id present on our db {entityFromLocalDb}", entityFromLocalDb);
             if (entityFromLocalDb != null)
             {
                 return Ok(entityFromLocalDb);
