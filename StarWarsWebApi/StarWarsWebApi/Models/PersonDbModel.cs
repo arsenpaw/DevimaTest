@@ -1,4 +1,6 @@
 ﻿using StarWarsApiCSharp;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 
 namespace StarWarsWebApi.Models
 {
@@ -6,6 +8,6 @@ namespace StarWarsWebApi.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; init; }
+        public Guid PrivateId { get; init; }
     }
 }
