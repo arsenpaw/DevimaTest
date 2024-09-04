@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using StarWarsApiCSharp;
 using StarWarsWebApi.Interaces;
+using StarWarsWebApi.Repositories;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace StarWarsWebApi.Controllers
@@ -11,24 +12,40 @@ namespace StarWarsWebApi.Controllers
     {
         IRepository<Person> _repository;
         IPeopleRepo _peopleRepo;
-        public PeopleController(IRepository<Person> repository, IPeopleRepo peopleRepo)
+        ILogger<PeopleController> _logger;
+        public PeopleController(IRepository<Person> repository, IPeopleRepo peopleRepo, ILogger<PeopleController> logger)
         {
             _repository = repository;
             _peopleRepo = peopleRepo;
+            _logger = logger;
+
         }
 
         [HttpGet]
         public async Task<IActionResult> GetList([FromQuery]int page = 1, int pcsPerPage = 10)
         {
-           var personList =  _repository.GetEntities(page, pcsPerPage).ToList();  
-           await _peopleRepo.WritePersonToDB(personList);
-            return Ok(personList);
+           var personCoolection =  _repository.GetEntities(page, pcsPerPage);  
+            _logger.LogInformation("Getting people from API");
+            await _peopleRepo.WritePersonToDB(personCoolection.ToList());
+            _logger.LogInformation("Send responce to userfrom API");
+            return Ok(personCoolection);
         }
-        [HttpGet("localdb{id:guid}")]
-        public async Task<IActionResult> GetLocal(Guid id)
+        [HttpGet("{id:int}")]
+        public async Task<IActionResult> GetById(int id)
         {
-            return Ok(await _peopleRepo.GetPeopleByIdOrDefault(id));
-              
+            var entityFromLocalDb = await _peopleRepo.GetPeopleByIdOrDefault(id);
+            _logger.LogInformation("Is entity with id present on our db {entityFromLocalDb}",entityFromLocalDb);
+            if (entityFromLocalDb != null)
+            {
+                return Ok(entityFromLocalDb);
+            }
+            var person = _repository.GetById(id);
+            _logger.LogInformation("Get entity from external API ");
+            await _peopleRepo.WritePersonToDB(person, id);
+            _logger.LogInformation("Send responce to user from external API");
+            return Ok(person);
+
+
         }
     }
 }
