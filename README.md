@@ -5,4 +5,4 @@ Here is some docs:</br>
 2. GET `People{id}` -- accept `id` as a path option and firstly get data from table, then call api.</br>
 
 If ypu have any questions feel free to ask !</br>
-*If you noticed that api work a bit slow, it because my Azure sub do not more allow me to host programms on EU region, so i hosted it in South America :)
+If you noticed that api work a bit slow, it because my Azure subscription do more not allow me to host SQL database on EU region, so i hosted it in South America :)
