@@ -2,7 +2,7 @@
 
 namespace StarWarsWebApi.Interaces
 {
-    public interface IPeopleRepo
+    public interface IPeopleRepository
     {
         Task WritePersonToDB(List<Person> person);
         Task<Person> GetPeopleByIdOrDefault(Guid id);

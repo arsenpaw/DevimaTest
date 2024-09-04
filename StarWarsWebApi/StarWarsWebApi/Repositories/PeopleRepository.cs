@@ -10,14 +10,14 @@ using WebApplication.Context;
 
 namespace StarWarsWebApi.Repositories
 {
-    public class PeopleRepo : IPeopleRepo
+    public class PeopleRepository : IPeopleRepository
     {
         private readonly StarWarsContext _context;
         private readonly IMapper _mapper;
-        private readonly ILogger<PeopleRepo> _logger;
+        private readonly ILogger<PeopleRepository> _logger;
 
-        public PeopleRepo(StarWarsContext context, IMapper mapper,
-            ILogger<PeopleRepo> logger)
+        public PeopleRepository(StarWarsContext context, IMapper mapper,
+            ILogger<PeopleRepository> logger)
         {
             _context = context;
             _mapper = mapper;

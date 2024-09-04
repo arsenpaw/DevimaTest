@@ -4,8 +4,6 @@ namespace StarWarsWebApi.Services
 {
     public class PersonService
     {
-
-
         private readonly IMapper _mapper;
         private readonly ILogger<PersonService> _logger;
 

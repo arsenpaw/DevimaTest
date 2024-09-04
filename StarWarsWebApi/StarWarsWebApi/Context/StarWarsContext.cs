@@ -21,6 +21,9 @@ namespace WebApplication.Context
             modelBuilder.Entity<PersonDbModel>()
                 .HasIndex(p => p.Name)
                 .IsUnique();
+            modelBuilder.Entity<PersonDbModel>()
+                .HasIndex(p => p.ExternalApiId)
+                .IsUnique();
         }
 
 

@@ -11,9 +11,9 @@ namespace StarWarsWebApi.Controllers
     public class PeopleController : ControllerBase
     {
         IRepository<Person> _repository;
-        IPeopleRepo _peopleRepo;
+        IPeopleRepository _peopleRepo;
         ILogger<PeopleController> _logger;
-        public PeopleController(IRepository<Person> repository, IPeopleRepo peopleRepo, ILogger<PeopleController> logger)
+        public PeopleController(IRepository<Person> repository, IPeopleRepository peopleRepo, ILogger<PeopleController> logger)
         {
             _repository = repository;
             _peopleRepo = peopleRepo;
