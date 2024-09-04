@@ -5,33 +5,72 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace StarWarsWebApi.Migrations
 {
-    /// <inheritdoc />
     public partial class makeidguid : Migration
     {
-        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterColumn<Guid>(
-                name: "PrivateId",
+            // Step 1: Drop the primary key constraint or any other constraints that depend on PrivateId
+            migrationBuilder.DropPrimaryKey(
+                name: "PK_Persons",
+                table: "Persons");
+
+            // Drop any additional constraints or indexes related to PrivateId here if needed
+
+            // Step 2: Add a temporary column of type Guid
+            migrationBuilder.AddColumn<Guid>(
+                name: "TempPrivateId",
                 table: "Persons",
                 type: "uniqueidentifier",
                 nullable: false,
-                oldClrType: typeof(int),
-                oldType: "int")
-                .OldAnnotation("SqlServer:Identity", "1, 1");
+                defaultValue: Guid.NewGuid());
+
+            // Step 3: Drop the old column
+            migrationBuilder.DropColumn(
+                name: "PrivateId",
+                table: "Persons");
+
+            // Step 4: Rename the new column to match the old column name
+            migrationBuilder.RenameColumn(
+                name: "TempPrivateId",
+                table: "Persons",
+                newName: "PrivateId");
+
+            // Step 5: Recreate the primary key or any other constraints that were dropped
+            migrationBuilder.AddPrimaryKey(
+                name: "PK_Persons",
+                table: "Persons",
+                column: "PrivateId");
+
+            // Add back any additional constraints or indexes related to PrivateId here if needed
         }
 
-        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterColumn<int>(
+            // Reverse the changes to recreate the original state
+
+            // Drop the primary key constraint
+            migrationBuilder.DropPrimaryKey(
+                name: "PK_Persons",
+                table: "Persons");
+
+            // Drop the GUID column
+            migrationBuilder.DropColumn(
+                name: "PrivateId",
+                table: "Persons");
+
+            // Recreate the original int column with IDENTITY property
+            migrationBuilder.AddColumn<int>(
                 name: "PrivateId",
                 table: "Persons",
                 type: "int",
-                nullable: false,
-                oldClrType: typeof(Guid),
-                oldType: "uniqueidentifier")
+                nullable: false)
                 .Annotation("SqlServer:Identity", "1, 1");
+
+            // Recreate the primary key
+            migrationBuilder.AddPrimaryKey(
+                name: "PK_Persons",
+                table: "Persons",
+                column: "PrivateId");
         }
     }
 }
