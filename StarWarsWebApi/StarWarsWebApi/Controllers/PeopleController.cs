@@ -27,8 +27,8 @@ namespace StarWarsWebApi.Controllers
         [HttpGet("localdb{id:guid}")]
         public async Task<IActionResult> GetLocal(Guid id)
         {
-            var entity = await _peopleRepo.GetPeapleByIdOrDefault(id);
-            return entity != null ? NotFound() : Ok();           
+            return Ok(await _peopleRepo.GetPeopleByIdOrDefault(id));
+              
         }
     }
 }

@@ -40,13 +40,13 @@ namespace StarWarsWebApi.Repositories
 
             return filteredDataToDb;
         }
-        public async Task<Person?> GetPeapleByIdOrDefault(Guid id)
+        public async Task<Person?> GetPeopleByIdOrDefault(Guid id)
         {
             
             var entity = await _context.Persons.
                 FirstOrDefaultAsync(x => x.PrivateId == id);
-            return  entity != null ? _mapper.Map<PersonDbModel, Person>(entity) : null; 
-           
+            return entity != null ? _mapper.Map<PersonDbModel, Person>(entity) : null;
+
 
         }
         public async Task WritePersonToDB(List<Person> person)
