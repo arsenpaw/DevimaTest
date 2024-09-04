@@ -26,6 +26,10 @@ namespace StarWarsWebApi.Controllers
         {
            var personCoolection =  _repository.GetEntities(page, pcsPerPage);  
             _logger.LogInformation("Getting people from API");
+            if (personCoolection == null)
+            {
+                return NotFound();
+            }
             await _peopleRepo.WritePersonToDB(personCoolection.ToList());
             _logger.LogInformation("Send responce to userfrom API");
             return Ok(personCoolection);
@@ -41,6 +45,10 @@ namespace StarWarsWebApi.Controllers
             }
             var person = _repository.GetById(id);
             _logger.LogInformation("Get entity from external API ");
+            if (person == null)
+            {
+                return NotFound();
+            }
             await _peopleRepo.WritePersonToDB(person, id);
             _logger.LogInformation("Send responce to user from external API");
             return Ok(person);
