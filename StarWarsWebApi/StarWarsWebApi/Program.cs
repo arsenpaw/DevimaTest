@@ -8,6 +8,7 @@ using StarWarsApiCSharp;
 using StarWarsWebApi.Interaces;
 using WebApplication;
 using StarWarsWebApi;
+using StarWarsWebApi.Services;
 
 var builder = Microsoft.AspNetCore.Builder.WebApplication.CreateBuilder(args);
 var configurationFile = new ConfigurationBuilder()
@@ -38,6 +39,7 @@ builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IPeopleRepository, PeopleRepository>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddScoped<IPersonService, PersonService>();
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 var app = builder.Build();
 

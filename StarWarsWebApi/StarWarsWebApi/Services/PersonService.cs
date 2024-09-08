@@ -1,18 +1,65 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
+using StarWarsApiCSharp;
+using StarWarsWebApi.Controllers;
+using StarWarsWebApi.Interaces;
+using ErrorOr;
+
 
 namespace StarWarsWebApi.Services
 {
-    public class PersonService
+    public class PersonService : IPersonService
     {
-        private readonly IMapper _mapper;
-        private readonly ILogger<PersonService> _logger;
-
-        public PersonService(IMapper mapper,
-            ILogger<PersonService> logger)
+        IRepository<Person> _repository;
+        IPeopleRepository _peopleRepo;
+        ILogger<PeopleController> _logger;
+        public PersonService(IRepository<Person> repository, IPeopleRepository peopleRepo, ILogger<PeopleController> logger)
         {
-            _mapper = mapper;
+            _repository = repository;
+            _peopleRepo = peopleRepo;
             _logger = logger;
 
         }
+
+        public async Task<ErrorOr<Person>> GetByIdWithLocalDbPriorityAsync(int id)
+        {
+            var entityFromLocalDb = await _peopleRepo.GetPeopleByIdOrDefault(id);
+            _logger.LogInformation("Is entity with id present on our db {entityFromLocalDb}", entityFromLocalDb);
+            if (entityFromLocalDb != null)
+            {
+                return (entityFromLocalDb);
+            }
+            var person = _repository.GetById(id);
+            _logger.LogInformation("Get entity from external API ");
+            if (person == null)
+            {
+                return Error.NotFound();
+            }
+            await _peopleRepo.WritePersonToDB(person, id);
+            _logger.LogInformation("Send responce to user from external API");
+            return (person);
+        }
+
+        public async Task<ErrorOr<List<Person>>> GetListOfDeviceAndWriteToDbAsync(int page = 1, int pcsPerPage = 10)
+        {
+            _logger.LogInformation("Retrieving people from repository");
+
+            ICollection<Person> personCollection = _repository.GetEntities(page, pcsPerPage);
+
+            if (personCollection == null || !personCollection.Any())
+            {
+                _logger.LogWarning("No people found");
+                return Error.NotFound("No people found");
+            }
+
+            _logger.LogInformation("Writing people to the database");
+            var personList = personCollection.ToList();
+            await _peopleRepo.WritePersonToDB(personList);
+
+            _logger.LogInformation("Returning person collection to the user");
+            return personList;
+
+        }
+
     }
 }
