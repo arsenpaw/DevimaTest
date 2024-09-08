@@ -12,7 +12,7 @@ namespace WebApplication.Context
 
         public StarWarsContext(DbContextOptions<StarWarsContext> options) : base(options)
         {
-           if(!Database.EnsureCreated())
+           if(Database.EnsureCreated())
             {
                 Database.Migrate();
             }

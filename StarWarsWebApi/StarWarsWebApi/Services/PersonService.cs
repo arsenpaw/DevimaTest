@@ -40,7 +40,7 @@ namespace StarWarsWebApi.Services
             return (person);
         }
 
-        public async Task<ErrorOr<List<Person>>> GetListOfDeviceAndWriteToDbAsync(int page = 1, int pcsPerPage = 10)
+        public async Task<ErrorOr<List<Person>>> GetListOfDeviceAndWriteToDbAsync(int page , int pcsPerPage)
         {
             _logger.LogInformation("Retrieving people from repository");
 

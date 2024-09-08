@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Azure;
+using Microsoft.AspNetCore.Mvc;
 using StarWarsApiCSharp;
 using StarWarsWebApi.Interaces;
 using StarWarsWebApi.Repositories;
@@ -22,14 +23,15 @@ namespace StarWarsWebApi.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetList([FromQuery] int page = 1, int pcsPerPage = 10)
+        public async Task<IActionResult> GetList([FromQuery] int page = 1, int pcsPerPage = 82)
         {
            var responce =  await _personService.GetListOfDeviceAndWriteToDbAsync(page, pcsPerPage);
             if (responce.IsError)
             {
                 return NotFound(responce.Errors);
             }
-            return Ok(responce.Value);
+            return Ok(new { total = responce.Value.Count, data = responce.Value });
+
         }
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById(int id)
