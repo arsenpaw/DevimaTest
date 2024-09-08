@@ -12,8 +12,8 @@ using WebApplication.Context;
 namespace StarWarsWebApi.Migrations
 {
     [DbContext(typeof(StarWarsContext))]
-    [Migration("20240904134733_add-db")]
-    partial class adddb
+    [Migration("20240908160053_Create database")]
+    partial class Createdatabase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -27,11 +27,9 @@ namespace StarWarsWebApi.Migrations
 
             modelBuilder.Entity("StarWarsWebApi.Models.PersonDbModel", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("PrivateId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("BirthYear")
                         .HasColumnType("nvarchar(max)");
@@ -42,10 +40,14 @@ namespace StarWarsWebApi.Migrations
                     b.Property<DateTime>("Edited")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("ExternalApiId")
+                        .HasColumnType("int");
+
                     b.Property<string>("EyeColor")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Films")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Gender")
@@ -64,29 +66,37 @@ namespace StarWarsWebApi.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("SkinColor")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Species")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Starships")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Url")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Vehicles")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                    b.HasKey("PrivateId");
 
-                    b.HasIndex("Id")
-                        .IsUnique();
+                    b.HasIndex("ExternalApiId")
+                        .IsUnique()
+                        .HasFilter("[ExternalApiId] IS NOT NULL");
 
-                    b.ToTable("Persons");
+                    b.HasIndex("Name")
+                        .IsUnique()
+                        .HasFilter("[Name] IS NOT NULL");
+
+                    b.ToTable("StarWarsCharacters");
                 });
 #pragma warning restore 612, 618
         }

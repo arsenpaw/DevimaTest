@@ -1,13 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using StarWarsWebApi.Models;
-
+using System.ComponentModel.DataAnnotations.Schema;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace WebApplication.Context
 {
     public class StarWarsContext : DbContext
     {
-
+       
         public DbSet<PersonDbModel> Persons { get; set; }
 
         public StarWarsContext(DbContextOptions<StarWarsContext> options) : base(options)

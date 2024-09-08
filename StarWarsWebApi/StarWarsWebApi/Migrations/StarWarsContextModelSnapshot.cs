@@ -93,7 +93,7 @@ namespace StarWarsWebApi.Migrations
                         .IsUnique()
                         .HasFilter("[Name] IS NOT NULL");
 
-                    b.ToTable("Persons");
+                    b.ToTable("StarWarsCharacters");
                 });
 #pragma warning restore 612, 618
         }
