@@ -12,7 +12,10 @@ namespace WebApplication.Context
 
         public StarWarsContext(DbContextOptions<StarWarsContext> options) : base(options)
         {
-            Database.EnsureCreated();
+           if(!Database.EnsureCreated())
+            {
+                Database.Migrate();
+            }
 
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
