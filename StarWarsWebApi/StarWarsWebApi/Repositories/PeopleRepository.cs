@@ -1,11 +1,10 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
+
 using Microsoft.EntityFrameworkCore;
 using StarWarsApiCSharp;
 using StarWarsWebApi.Interaces;
 using StarWarsWebApi.Models;
-using System;
+using ErrorOr;
 using WebApplication.Context;
 
 namespace StarWarsWebApi.Repositories
@@ -26,17 +25,17 @@ namespace StarWarsWebApi.Repositories
         }
         private async Task<List<PersonDbModel>> DuplicateCheck(List<PersonDbModel> dataToDb)
         {
-            var idsToCheck = dataToDb.Select(x => x.Name).ToList();
+            var idsToCheck = dataToDb.Select(x => x.ExternalApiId).ToList();
 
 
             var existingIds = await _context.Persons
-                .Where(x => idsToCheck.Contains(x.Name))
-                .Select(x => x.Name)
+                .Where(x => idsToCheck.Contains(x.ExternalApiId))
+                .Select(x => x.ExternalApiId)
                 .ToListAsync();
 
 
             var filteredDataToDb = dataToDb
-                .Where(x => !existingIds.Contains(x.Name))
+                .Where(x => !existingIds.Contains(x.ExternalApiId))
                 .ToList();
 
             return filteredDataToDb;
@@ -123,5 +122,50 @@ namespace StarWarsWebApi.Repositories
 
             }
         }
+
+        
+        public async Task<ErrorOr<Updated>> UpdatePersonToDB(PersonDbModel person)
+        {
+            try
+            {
+                var entityToChange = await _context.Persons
+                    .FirstOrDefaultAsync(x => x.PrivateId == person.PrivateId);
+                if (entityToChange == null)
+                    return Error.Failure("Person not found"); 
+                _mapper.Map(person, entityToChange);
+               await _context.SaveChangesAsync();
+
+                return Result.Updated;
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex, "Error writing to database while updating person");
+                throw;
+            }
+        }
+
+        public async Task<ErrorOr<Deleted>> DeletePersonFromDB(Guid id)
+        {
+            try
+            {
+                var entityToDelete = await _context.Persons
+                    .FirstOrDefaultAsync(x => x.PrivateId == id);
+                if (entityToDelete == null)
+                    return Error.Failure("Person not found"); 
+                _context.Persons.Remove(entityToDelete);
+                var changes = await _context.SaveChangesAsync();
+                if (changes == 0)
+                    return Error.Failure("Person not updated");
+
+                return Result.Deleted;
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex, "Error writing to database while updating person");
+                throw;
+            }
+        }
+
+        
     }
 }

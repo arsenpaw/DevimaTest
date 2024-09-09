@@ -12,21 +12,24 @@ namespace WebApplication.Context
 
         public StarWarsContext(DbContextOptions<StarWarsContext> options) : base(options)
         {
-           if(Database.EnsureCreated())
-            {
-                Database.Migrate();
-            }
+           
+            
+            
 
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            
             modelBuilder.Entity<PersonDbModel>()
                 .HasIndex(p => p.Name)
                 .IsUnique();
             modelBuilder.Entity<PersonDbModel>()
                 .HasIndex(p => p.ExternalApiId)
                 .IsUnique();
+            modelBuilder.Entity<PersonDbModel>()
+                .HasIndex(p => p.PrivateId)
+                .IsUnique();    
         }
 
 

@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Configuration;
 using Serilog;
 
@@ -35,10 +36,13 @@ builder.Host.UseSerilog((context, config) =>
 });
 builder.Services.AddDbContext<StarWarsContext>(options =>
    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IPeopleRepository, PeopleRepository>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddSingleton<IUrlParcer, UrlParcer>();
 builder.Services.AddScoped<IPersonService, PersonService>();
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 var app = builder.Build();

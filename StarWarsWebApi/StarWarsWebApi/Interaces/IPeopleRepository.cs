@@ -1,5 +1,6 @@
 ﻿using StarWarsApiCSharp;
-
+using StarWarsWebApi.Models;
+using ErrorOr;
 namespace StarWarsWebApi.Interaces
 {
     public interface IPeopleRepository
@@ -8,5 +9,9 @@ namespace StarWarsWebApi.Interaces
         Task<Person> GetPeopleByIdOrDefault(Guid id);
         Task<Person> GetPeopleByIdOrDefault(int ExternalId);
         Task WritePersonToDB(Person person, int id);
+
+        Task<ErrorOr<Updated>> UpdatePersonToDB(PersonDbModel person);
+
+        Task<ErrorOr<Deleted>> DeletePersonFromDB(Guid id);
     }
 }

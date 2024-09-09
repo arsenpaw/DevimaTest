@@ -13,8 +13,10 @@ namespace StarWarsWebApi.Services
         IRepository<Person> _repository;
         IPeopleRepository _peopleRepo;
         ILogger<PeopleController> _logger;
-        public PersonService(IRepository<Person> repository, IPeopleRepository peopleRepo, ILogger<PeopleController> logger)
+        IUrlParcer _urlParcer;
+        public PersonService(IRepository<Person> repository, IPeopleRepository peopleRepo, ILogger<PeopleController> logger, IUrlParcer urlParcer)
         {
+            _urlParcer = urlParcer;
             _repository = repository;
             _peopleRepo = peopleRepo;
             _logger = logger;
@@ -40,11 +42,17 @@ namespace StarWarsWebApi.Services
             return (person);
         }
 
+
+        private async Task<ErrorOr<string>> GetPersonIdFromUrl(string url)
+        {
+            return Error.NotFound();
+        }
+
         public async Task<ErrorOr<List<Person>>> GetListOfDeviceAndWriteToDbAsync(int page , int pcsPerPage)
         {
             _logger.LogInformation("Retrieving people from repository");
 
-            ICollection<Person> personCollection = _repository.GetEntities(page, pcsPerPage);
+            ICollection<Person> personCollection = _repository.GetEntities(page, pcsPerPage).ToList();
 
             if (personCollection == null || !personCollection.Any())
             {
@@ -54,6 +62,7 @@ namespace StarWarsWebApi.Services
 
             _logger.LogInformation("Writing people to the database");
             var personList = personCollection.ToList();
+            
             await _peopleRepo.WritePersonToDB(personList);
 
             _logger.LogInformation("Returning person collection to the user");

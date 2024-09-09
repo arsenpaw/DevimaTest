@@ -10,7 +10,7 @@ namespace StarWarsWebApi.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public Guid PrivateId { get; init; }
+        public Guid PrivateId { get; set; }
 
         public int? ExternalApiId { get; set; }
         [JsonProperty]
