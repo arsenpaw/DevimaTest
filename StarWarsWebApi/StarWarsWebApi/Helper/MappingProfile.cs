@@ -42,7 +42,6 @@ namespace StarWarsWebApi.Helper
                 .ForMember(dest => dest.Species, opt => opt.Ignore())
                 .ForMember(dest => dest.Starships, opt => opt.Ignore())
                 .ForMember(dest => dest.Vehicles, opt => opt.Ignore())
-                .ForMember(dest => dest.Edited, opt => opt.Ignore())
                 .ForMember(dest => dest.Created, opt => opt.Ignore());
         }
     }
