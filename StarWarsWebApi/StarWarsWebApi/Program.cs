@@ -1,17 +1,19 @@
+using System.Reflection;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
-using Microsoft.Extensions.Configuration;
 using Serilog;
-
 using StarWarsWebApi.Repositories;
-using WebApplication.Context;
+using StarWarsWebApi.Context;
 using StarWarsApiCSharp;
+using StarWarsWebApi.Common;
 using StarWarsWebApi.Interaces;
-using WebApplication;
-using StarWarsWebApi;
-using StarWarsWebApi.Services;
 
-var builder = Microsoft.AspNetCore.Builder.WebApplication.CreateBuilder(args);
+using StarWarsWebApi.Helper;
+using StarWarsWebApi.Models;
+using StarWarsWebApi.Services;
+using StarWarsWebApi.Validation;
+
+var builder = WebApplication.CreateBuilder(args);
 var configurationFile = new ConfigurationBuilder()
        .SetBasePath(Directory.GetCurrentDirectory())
        .AddJsonFile("appsettings.json")
@@ -28,7 +30,7 @@ builder.Services.AddControllers();
 
 builder.Host.UseSerilog((context, config) =>
 {
-    var logFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "log.txt");
+    Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "log.txt");
     config
      .ReadFrom.Configuration(configurationFile);
 
@@ -42,9 +44,9 @@ builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IPeopleRepository, PeopleRepository>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddSingleton<IUrlParcer, UrlParcer>();
 builder.Services.AddScoped<IPersonService, PersonService>();
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
+builder.Services.AddValidatorsFromAssemblyContaining<IAssemblyMarker>();
 var app = builder.Build();
 
 InitializeDatabase(app);

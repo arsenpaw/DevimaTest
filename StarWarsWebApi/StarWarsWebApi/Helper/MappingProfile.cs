@@ -1,33 +1,20 @@
 ﻿using AutoMapper;
 using StarWarsApiCSharp;
 using StarWarsWebApi.Models;
-using System.Diagnostics;
-using StarWarsWebApi.Services;
 
-namespace StarWarsWebApi
+using StarWarsWebApi.Services;
+using StarWarsWebApi.Utils;
+
+namespace StarWarsWebApi.Helper
 {
  
-    public sealed class ExternalIdResolver : AutoMapper.IValueResolver<Person, PersonDbModel, int?>
+    public sealed class ExternalIdResolver : IValueResolver<Person, PersonDbModel, int?>
     {
-        private readonly IUrlParcer _urlParcer;
-
-        public ExternalIdResolver(IUrlParcer urlParcer)
-        {
-            _urlParcer = urlParcer;
-        }
 
         public int? Resolve(Person source, PersonDbModel destination, int? destMember, ResolutionContext context)
         {
-            
-            var task = Task.Run(async () =>
-            {
-                var response = await _urlParcer.GetIdFromUrl(source.Url);
-                return response;
-            });
-
-            var result = task.Result;
-
-            return result.IsError ? null : result.Value;
+            var response =  UrlParcer.GetIdFromUrl(source.Url);
+            return response.IsError ? null : response.Value;
         }
     }
 
@@ -55,8 +42,8 @@ namespace StarWarsWebApi
                 .ForMember(dest => dest.Species, opt => opt.Ignore())
                 .ForMember(dest => dest.Starships, opt => opt.Ignore())
                 .ForMember(dest => dest.Vehicles, opt => opt.Ignore())
-                .ForMember(dest => dest.Edited, opt => opt.Ignore())
-                .ForMember(dest => dest.Created, opt => opt.Ignore());
+                .ForMember(dest => dest.Created, opt => opt.Ignore())
+                .AfterMap((src, dest) => dest.Edited = DateTime.Now);
         }
     }
 }

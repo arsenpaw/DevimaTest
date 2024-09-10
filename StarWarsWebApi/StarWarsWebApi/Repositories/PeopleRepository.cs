@@ -5,7 +5,7 @@ using StarWarsApiCSharp;
 using StarWarsWebApi.Interaces;
 using StarWarsWebApi.Models;
 using ErrorOr;
-using WebApplication.Context;
+using StarWarsWebApi.Context;
 
 namespace StarWarsWebApi.Repositories
 {
@@ -66,7 +66,6 @@ namespace StarWarsWebApi.Repositories
             try
             {
                 entity.ExternalApiId = externalApiId;
-                await _context.SaveChangesAsync();
             }
             catch (Exception)
             {
@@ -97,7 +96,6 @@ namespace StarWarsWebApi.Repositories
                 var dbModelFromUser = _mapper.Map<Person, PersonDbModel>(person);
                 dbModelFromUser.ExternalApiId = id;
                 await _context.Persons.AddAsync(dbModelFromUser);
-                await _context.SaveChangesAsync();
             }
             catch (DbUpdateException)
             {
@@ -113,7 +111,6 @@ namespace StarWarsWebApi.Repositories
             try
             {
                 await _context.AddRangeAsync(filteredData);
-                await _context.SaveChangesAsync();
             }
             catch (DbUpdateException)
             {
@@ -124,7 +121,7 @@ namespace StarWarsWebApi.Repositories
         }
 
         
-        public async Task<ErrorOr<Updated>> UpdatePersonToDB(PersonDbModel person)
+        public async Task<ErrorOr<PersonDbModel>> UpdatePersonToDB(PersonDbModel person)
         {
             try
             {
@@ -133,9 +130,7 @@ namespace StarWarsWebApi.Repositories
                 if (entityToChange == null)
                     return Error.Failure("Person not found"); 
                 _mapper.Map(person, entityToChange);
-               await _context.SaveChangesAsync();
-
-                return Result.Updated;
+                return entityToChange;
             }
             catch (DbUpdateException ex)
             {
@@ -153,10 +148,6 @@ namespace StarWarsWebApi.Repositories
                 if (entityToDelete == null)
                     return Error.Failure("Person not found"); 
                 _context.Persons.Remove(entityToDelete);
-                var changes = await _context.SaveChangesAsync();
-                if (changes == 0)
-                    return Error.Failure("Person not updated");
-
                 return Result.Deleted;
             }
             catch (DbUpdateException ex)

@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
-using Azure;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using StarWarsApiCSharp;
+using StarWarsWebApi.Context;
 using StarWarsWebApi.Interaces;
 using StarWarsWebApi.Models;
-using StarWarsWebApi.Repositories;
-using Swashbuckle.AspNetCore.Swagger;
+using StarWarsWebApi.Models.Dto;
 
 namespace StarWarsWebApi.Controllers
 {
@@ -13,75 +13,83 @@ namespace StarWarsWebApi.Controllers
     [ApiController]
     public class PeopleController : ControllerBase
     {
-        IRepository<Person> _repository;
-        IPersonService _personService;
-        ILogger<PeopleController> _logger;
-        IPeopleRepository _peopleRepository;
-        IMapper _mapper;
-        public PeopleController(IRepository<Person> repository, IPersonService personService, ILogger<PeopleController> logger,    IPeopleRepository peopleRepository,IMapper mapper)
+        
+        private readonly IPersonService _personService;
+        private readonly  IPeopleRepository _peopleRepository;
+        private readonly IMapper _mapper;
+        public readonly StarWarsContext _context;
+        public PeopleController(IPersonService personService, IPeopleRepository peopleRepository,
+            IMapper mapper, StarWarsContext context)
         {
-            _repository = repository;
             _personService = personService;
-            _logger = logger;
             _peopleRepository = peopleRepository;
             _mapper = mapper;   
+            _context = context; 
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetList([FromQuery] int page = 1, int pcsPerPage = 82)
+        public async Task<ActionResult<PaginaedResponse<List<Person>>>> GetList([FromQuery] int page = 1, int pcsPerPage = 82)
         {
-           var responce =  await _personService.GetListOfDeviceAndWriteToDbAsync(page, pcsPerPage);
-            if (responce.IsError)
+           var response =  await _personService.GetListOfDeviceAndWriteToDbAsync(page, pcsPerPage);
+            if (response.IsError)
             {
-                return NotFound(responce.Errors);
+                return NotFound(response.Errors);
             }
-            return Ok(new { total = responce.Value.Count, data = responce.Value });
-
+            return new PaginaedResponse<List<Person>> { Count = response.Value.Count, Data = response.Value };
         }
+
+       
+        
         [HttpGet("{id:int}")]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<ActionResult<Person>> GetById(int id)
         {
-            var responce = await _personService.GetByIdWithLocalDbPriorityAsync(id);
-            if (responce.IsError)
+            var response = await _personService.GetByIdWithLocalDbPriorityAsync(id);
+            if (response.IsError)
             {
-                return NotFound(responce.Errors);
+                return NotFound(response.Errors);
             }
-            return Ok(responce.Value);
+            return response.Value;
 
         }
         
         [HttpGet("/fromLocal/{id:guid}")]
-        public async Task<ActionResult<IList<Person>>> GetPeople(Guid id)
+        public async Task<ActionResult<Person>> GetPeople(Guid id)
         {
-            var responce = await _peopleRepository.GetPeopleByIdOrDefault(id);
-            if (responce == null)
+            var response = await _peopleRepository.GetPeopleByIdOrDefault(id);
+            if (response == null)
             {
                 return NotFound();
             }
-            return Ok(responce);
+            return response;
         }
-
         [HttpPut("{id:guid}")]
-        public async Task<ActionResult<IList<Person>>> UpdatePeople([FromBody]PersonUpdateModel person,  Guid id)
+        public async Task<ActionResult<Person>> UpdatePeople([FromBody]PersonUpdateModel person,  Guid id
+        ,[FromServices] IValidator<PersonUpdateModel> personValidator )
         {
+            var validationResult =  await personValidator.ValidateAsync(person);
+            if (!validationResult.IsValid)
+                return BadRequest(validationResult.Errors);
+            
             var personDbModel = _mapper.Map<PersonUpdateModel, PersonDbModel>(person);
             personDbModel.PrivateId = id;
-            var responce = await _peopleRepository.UpdatePersonToDB(personDbModel);
-            if (responce.IsError)
-            {
-                return NotFound(responce.Errors);
-            }
-            return Ok(responce.Value);
+            var response = await _peopleRepository.UpdatePersonToDB(personDbModel);
+            
+            if (response.IsError)
+                return NotFound(response.Errors);
+            
+            await _context.SaveChangesAsync(); 
+            return _mapper.Map<PersonDbModel, Person>(response.Value) ;
         }
         [HttpDelete("{id:guid}")]
-        public async Task<ActionResult<IList<Person>>> DeletePeople(Guid id)
+        public async Task<ActionResult> DeletePeople(Guid id)
         {
-            var responce = await _peopleRepository.DeletePersonFromDB(id);
-            if (responce.IsError)
+            var response = await _peopleRepository.DeletePersonFromDB(id);
+            if (response.IsError)
             {
-                return NotFound(responce.Errors);
+                return NotFound(response.Errors);
             }
-            return Ok(responce.Value);
+            await _context.SaveChangesAsync(); 
+            return Ok();
         }
         
         

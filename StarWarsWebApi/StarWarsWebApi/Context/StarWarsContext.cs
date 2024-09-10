@@ -1,9 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using StarWarsWebApi.Models;
-using System.ComponentModel.DataAnnotations.Schema;
-using static System.Net.Mime.MediaTypeNames;
 
-namespace WebApplication.Context
+
+namespace StarWarsWebApi.Context
 {
     public class StarWarsContext : DbContext
     {
@@ -12,9 +11,6 @@ namespace WebApplication.Context
 
         public StarWarsContext(DbContextOptions<StarWarsContext> options) : base(options)
         {
-           
-            
-            
 
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
