@@ -60,7 +60,6 @@ namespace StarWarsWebApi.Controllers
             }
             return Ok(responce);
         }
-
         [HttpPut("{id:guid}")]
         public async Task<ActionResult<IList<Person>>> UpdatePeople([FromBody]PersonUpdateModel person,  Guid id)
         {
