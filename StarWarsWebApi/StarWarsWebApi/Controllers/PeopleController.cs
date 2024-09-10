@@ -1,11 +1,8 @@
 ﻿using AutoMapper;
-using Azure;
 using Microsoft.AspNetCore.Mvc;
 using StarWarsApiCSharp;
 using StarWarsWebApi.Interaces;
 using StarWarsWebApi.Models;
-using StarWarsWebApi.Repositories;
-using Swashbuckle.AspNetCore.Swagger;
 
 namespace StarWarsWebApi.Controllers
 {
@@ -14,14 +11,12 @@ namespace StarWarsWebApi.Controllers
     public class PeopleController : ControllerBase
     {
         
-        IPersonService _personService;
-        ILogger<PeopleController> _logger;
-        IPeopleRepository _peopleRepository;
-        IMapper _mapper;
-        public PeopleController(IPersonService personService, ILogger<PeopleController> logger,    IPeopleRepository peopleRepository,IMapper mapper)
+        private readonly IPersonService _personService;
+        private readonly  IPeopleRepository _peopleRepository;
+        private readonly IMapper _mapper;
+        public PeopleController(IPersonService personService, IPeopleRepository peopleRepository,IMapper mapper)
         {
             _personService = personService;
-            _logger = logger;
             _peopleRepository = peopleRepository;
             _mapper = mapper;   
         }
@@ -29,55 +24,55 @@ namespace StarWarsWebApi.Controllers
         [HttpGet]
         public async Task<ActionResult> GetList([FromQuery] int page = 1, int pcsPerPage = 82)
         {
-           var responce =  await _personService.GetListOfDeviceAndWriteToDbAsync(page, pcsPerPage);
-            if (responce.IsError)
+           var response =  await _personService.GetListOfDeviceAndWriteToDbAsync(page, pcsPerPage);
+            if (response.IsError)
             {
-                return NotFound(responce.Errors);
+                return NotFound(response.Errors);
             }
-            return Ok(new { total = responce.Value.Count, data = responce.Value });
+            return Ok(new { total = response.Value.Count, data = response.Value });
 
         }
         [HttpGet("{id:int}")]
         public async Task<ActionResult<Person>> GetById(int id)
         {
-            var responce = await _personService.GetByIdWithLocalDbPriorityAsync(id);
-            if (responce.IsError)
+            var response = await _personService.GetByIdWithLocalDbPriorityAsync(id);
+            if (response.IsError)
             {
-                return NotFound(responce.Errors);
+                return NotFound(response.Errors);
             }
-            return responce.Value;
+            return response.Value;
 
         }
         
         [HttpGet("/fromLocal/{id:guid}")]
         public async Task<ActionResult<Person>> GetPeople(Guid id)
         {
-            var responce = await _peopleRepository.GetPeopleByIdOrDefault(id);
-            if (responce == null)
+            var response = await _peopleRepository.GetPeopleByIdOrDefault(id);
+            if (response == null)
             {
                 return NotFound();
             }
-            return responce;
+            return response;
         }
         [HttpPut("{id:guid}")]
         public async Task<ActionResult<Person>> UpdatePeople([FromBody]PersonUpdateModel person,  Guid id)
         {
             var personDbModel = _mapper.Map<PersonUpdateModel, PersonDbModel>(person);
             personDbModel.PrivateId = id;
-            var responce = await _peopleRepository.UpdatePersonToDB(personDbModel);
-            if (responce.IsError)
+            var response = await _peopleRepository.UpdatePersonToDB(personDbModel);
+            if (response.IsError)
             {
-                return NotFound(responce.Errors);
+                return NotFound(response.Errors);
             }
-            return _mapper.Map<PersonDbModel, Person>(responce.Value) ;
+            return _mapper.Map<PersonDbModel, Person>(response.Value) ;
         }
         [HttpDelete("{id:guid}")]
         public async Task<ActionResult> DeletePeople(Guid id)
         {
-            var responce = await _peopleRepository.DeletePersonFromDB(id);
-            if (responce.IsError)
+            var response = await _peopleRepository.DeletePersonFromDB(id);
+            if (response.IsError)
             {
-                return NotFound(responce.Errors);
+                return NotFound(response.Errors);
             }
             return Ok();
         }

@@ -1,13 +1,13 @@
 ﻿using AutoMapper;
 using StarWarsApiCSharp;
 using StarWarsWebApi.Models;
-using System.Diagnostics;
+
 using StarWarsWebApi.Services;
 
-namespace StarWarsWebApi
+namespace StarWarsWebApi.Helper
 {
  
-    public sealed class ExternalIdResolver : AutoMapper.IValueResolver<Person, PersonDbModel, int?>
+    public sealed class ExternalIdResolver : IValueResolver<Person, PersonDbModel, int?>
     {
         private readonly IUrlParcer _urlParcer;
 

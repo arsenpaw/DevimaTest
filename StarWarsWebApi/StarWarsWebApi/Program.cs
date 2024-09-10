@@ -1,17 +1,14 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
-using Microsoft.Extensions.Configuration;
 using Serilog;
-
 using StarWarsWebApi.Repositories;
-using WebApplication.Context;
+using StarWarsWebApi.Context;
 using StarWarsApiCSharp;
 using StarWarsWebApi.Interaces;
-using WebApplication;
-using StarWarsWebApi;
+
+using StarWarsWebApi.Helper;
 using StarWarsWebApi.Services;
 
-var builder = Microsoft.AspNetCore.Builder.WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(args);
 var configurationFile = new ConfigurationBuilder()
        .SetBasePath(Directory.GetCurrentDirectory())
        .AddJsonFile("appsettings.json")
@@ -28,7 +25,7 @@ builder.Services.AddControllers();
 
 builder.Host.UseSerilog((context, config) =>
 {
-    var logFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "log.txt");
+    Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "log.txt");
     config
      .ReadFrom.Configuration(configurationFile);
 

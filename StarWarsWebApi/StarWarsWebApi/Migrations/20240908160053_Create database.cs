@@ -1,6 +1,6 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
-
+using StarWarsWebApi.Context;
 #nullable disable
 
 namespace StarWarsWebApi.Migrations

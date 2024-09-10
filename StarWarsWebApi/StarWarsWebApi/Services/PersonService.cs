@@ -4,19 +4,20 @@ using StarWarsApiCSharp;
 using StarWarsWebApi.Controllers;
 using StarWarsWebApi.Interaces;
 using ErrorOr;
+using StarWarsWebApi.Context;
 
 
 namespace StarWarsWebApi.Services
 {
     public class PersonService : IPersonService
     {
-        IRepository<Person> _repository;
-        IPeopleRepository _peopleRepo;
-        ILogger<PeopleController> _logger;
-        IUrlParcer _urlParcer;
-        public PersonService(IRepository<Person> repository, IPeopleRepository peopleRepo, ILogger<PeopleController> logger, IUrlParcer urlParcer)
+        private readonly IRepository<Person> _repository;
+        private readonly IPeopleRepository _peopleRepo;
+        private readonly ILogger<PeopleController> _logger;
+        private readonly StarWarsContext _context;
+        public PersonService(IRepository<Person> repository, IPeopleRepository peopleRepo, ILogger<PeopleController> logger, StarWarsContext context)
         {
-            _urlParcer = urlParcer;
+            _context = context;
             _repository = repository;
             _peopleRepo = peopleRepo;
             _logger = logger;
@@ -39,6 +40,7 @@ namespace StarWarsWebApi.Services
             }
             await _peopleRepo.WritePersonToDB(person, id);
             _logger.LogInformation("Send responce to user from external API");
+            await _context.SaveChangesAsync();
             return (person);
         }
 
@@ -66,6 +68,7 @@ namespace StarWarsWebApi.Services
             await _peopleRepo.WritePersonToDB(personList);
 
             _logger.LogInformation("Returning person collection to the user");
+            await _context.SaveChangesAsync();
             return personList;
 
         }

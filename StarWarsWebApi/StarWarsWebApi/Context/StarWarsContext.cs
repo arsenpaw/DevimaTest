@@ -1,9 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using StarWarsWebApi.Models;
-using System.ComponentModel.DataAnnotations.Schema;
-using static System.Net.Mime.MediaTypeNames;
 
-namespace WebApplication.Context
+
+namespace StarWarsWebApi.Context
 {
     public class StarWarsContext : DbContext
     {
