@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 
 namespace StarWarsWebApi.Models
 {
-    [Table("StarWarsCharacters")]
+    [Table("StarWarsWebCharacters")]
     public class PersonDbModel : Person
     {
         [Key]
