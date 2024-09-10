@@ -13,9 +13,7 @@ namespace StarWarsWebApi.Helper
 
         public int? Resolve(Person source, PersonDbModel destination, int? destMember, ResolutionContext context)
         {
-         
             var response =  UrlParcer.GetIdFromUrl(source.Url);
-
             return response.IsError ? null : response.Value;
         }
     }

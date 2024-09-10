@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using StarWarsApiCSharp;
 using StarWarsWebApi.Interaces;
 using StarWarsWebApi.Models;
+using StarWarsWebApi.Models.Dto;
 
 namespace StarWarsWebApi.Controllers
 {
@@ -22,16 +23,20 @@ namespace StarWarsWebApi.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult> GetList([FromQuery] int page = 1, int pcsPerPage = 82)
+        public async Task<ActionResult<PaginaedResponse<List<Person>>>> GetList([FromQuery] int page = 1, int pcsPerPage = 82)
         {
            var response =  await _personService.GetListOfDeviceAndWriteToDbAsync(page, pcsPerPage);
             if (response.IsError)
             {
                 return NotFound(response.Errors);
             }
-            return Ok(new { total = response.Value.Count, data = response.Value });
+            return new PaginaedResponse<List<Person>> { Count = response.Value.Count, Data = response.Value };
+
 
         }
+
+       
+        
         [HttpGet("{id:int}")]
         public async Task<ActionResult<Person>> GetById(int id)
         {
@@ -74,6 +79,7 @@ namespace StarWarsWebApi.Controllers
             {
                 return NotFound(response.Errors);
             }
+            
             return Ok();
         }
         
