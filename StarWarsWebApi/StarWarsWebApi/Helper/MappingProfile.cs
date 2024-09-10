@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FluentValidation;
 using StarWarsApiCSharp;
 using StarWarsWebApi.Models;
 
@@ -35,7 +36,7 @@ namespace StarWarsWebApi.Helper
 
             CreateMap<PersonDbModel, Person>();
             
-            CreateMap<PersonUpdateModel, PersonDbModel>();
+            CreateMap<IValidator<PersonDbModel>, PersonDbModel>();
             
             CreateMap<PersonDbModel, PersonDbModel>()
                 .ForMember(dest => dest.Films, opt => opt.Ignore())

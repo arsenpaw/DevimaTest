@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using StarWarsApiCSharp;
 using StarWarsWebApi.Context;
@@ -62,15 +63,20 @@ namespace StarWarsWebApi.Controllers
             return response;
         }
         [HttpPut("{id:guid}")]
-        public async Task<ActionResult<Person>> UpdatePeople([FromBody]PersonUpdateModel person,  Guid id)
+        public async Task<ActionResult<Person>> UpdatePeople([FromBody]PersonUpdateModel person,  Guid id
+        ,[FromServices] IValidator<PersonUpdateModel> personValidator )
         {
+            var validationResult =  await personValidator.ValidateAsync(person);
+            if (!validationResult.IsValid)
+                return BadRequest(validationResult.Errors);
+            
             var personDbModel = _mapper.Map<PersonUpdateModel, PersonDbModel>(person);
             personDbModel.PrivateId = id;
             var response = await _peopleRepository.UpdatePersonToDB(personDbModel);
+            
             if (response.IsError)
-            {
                 return NotFound(response.Errors);
-            }
+            
             await _context.SaveChangesAsync(); 
             return _mapper.Map<PersonDbModel, Person>(response.Value) ;
         }
