@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using StarWarsApiCSharp;
+using StarWarsWebApi.Context;
 using StarWarsWebApi.Interaces;
 using StarWarsWebApi.Models;
 using StarWarsWebApi.Models.Dto;
@@ -15,11 +16,14 @@ namespace StarWarsWebApi.Controllers
         private readonly IPersonService _personService;
         private readonly  IPeopleRepository _peopleRepository;
         private readonly IMapper _mapper;
-        public PeopleController(IPersonService personService, IPeopleRepository peopleRepository,IMapper mapper)
+        public readonly StarWarsContext _context;
+        public PeopleController(IPersonService personService, IPeopleRepository peopleRepository,
+            IMapper mapper, StarWarsContext context)
         {
             _personService = personService;
             _peopleRepository = peopleRepository;
             _mapper = mapper;   
+            _context = context; 
         }
 
         [HttpGet]
@@ -67,6 +71,7 @@ namespace StarWarsWebApi.Controllers
             {
                 return NotFound(response.Errors);
             }
+            await _context.SaveChangesAsync(); 
             return _mapper.Map<PersonDbModel, Person>(response.Value) ;
         }
         [HttpDelete("{id:guid}")]
@@ -77,7 +82,7 @@ namespace StarWarsWebApi.Controllers
             {
                 return NotFound(response.Errors);
             }
-            
+            await _context.SaveChangesAsync(); 
             return Ok();
         }
         
