@@ -47,10 +47,18 @@ builder.Services.AddScoped<IPersonService, PersonService>();
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+InitializeDatabase(app);
+void InitializeDatabase(IApplicationBuilder app)
+{
+    using (var scope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
+    {
+        scope.ServiceProvider.GetRequiredService<StarWarsContext>().Database.Migrate();
+    }
+}
 
-    app.UseSwagger();
-    app.UseSwaggerUI();
+
+app.UseSwagger();
+app.UseSwaggerUI();
 
 
 
