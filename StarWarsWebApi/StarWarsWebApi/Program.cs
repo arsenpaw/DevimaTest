@@ -1,9 +1,11 @@
+using System.Reflection;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using StarWarsWebApi.Repositories;
 using StarWarsWebApi.Context;
 using StarWarsApiCSharp;
+using StarWarsWebApi.Common;
 using StarWarsWebApi.Interaces;
 
 using StarWarsWebApi.Helper;
@@ -44,7 +46,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IPersonService, PersonService>();
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
-builder.Services.AddScoped <IValidator<PersonUpdateModel>, PersonUpdateModelValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<IAssemblyMarker>();
 var app = builder.Build();
 
 InitializeDatabase(app);
