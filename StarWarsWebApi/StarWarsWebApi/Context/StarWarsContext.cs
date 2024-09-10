@@ -11,9 +11,6 @@ namespace StarWarsWebApi.Context
 
         public StarWarsContext(DbContextOptions<StarWarsContext> options) : base(options)
         {
-           
-            
-            
 
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)

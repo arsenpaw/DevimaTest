@@ -31,8 +31,6 @@ namespace StarWarsWebApi.Controllers
                 return NotFound(response.Errors);
             }
             return new PaginaedResponse<List<Person>> { Count = response.Value.Count, Data = response.Value };
-
-
         }
 
        
