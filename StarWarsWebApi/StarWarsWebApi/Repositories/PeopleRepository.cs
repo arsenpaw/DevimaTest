@@ -124,7 +124,7 @@ namespace StarWarsWebApi.Repositories
         }
 
         
-        public async Task<ErrorOr<Updated>> UpdatePersonToDB(PersonDbModel person)
+        public async Task<ErrorOr<PersonDbModel>> UpdatePersonToDB(PersonDbModel person)
         {
             try
             {
@@ -135,7 +135,7 @@ namespace StarWarsWebApi.Repositories
                 _mapper.Map(person, entityToChange);
                await _context.SaveChangesAsync();
 
-                return Result.Updated;
+                return entityToChange;
             }
             catch (DbUpdateException ex)
             {

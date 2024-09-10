@@ -13,14 +13,13 @@ namespace StarWarsWebApi.Controllers
     [ApiController]
     public class PeopleController : ControllerBase
     {
-        IRepository<Person> _repository;
+        
         IPersonService _personService;
         ILogger<PeopleController> _logger;
         IPeopleRepository _peopleRepository;
         IMapper _mapper;
-        public PeopleController(IRepository<Person> repository, IPersonService personService, ILogger<PeopleController> logger,    IPeopleRepository peopleRepository,IMapper mapper)
+        public PeopleController(IPersonService personService, ILogger<PeopleController> logger,    IPeopleRepository peopleRepository,IMapper mapper)
         {
-            _repository = repository;
             _personService = personService;
             _logger = logger;
             _peopleRepository = peopleRepository;
@@ -28,7 +27,7 @@ namespace StarWarsWebApi.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetList([FromQuery] int page = 1, int pcsPerPage = 82)
+        public async Task<ActionResult> GetList([FromQuery] int page = 1, int pcsPerPage = 82)
         {
            var responce =  await _personService.GetListOfDeviceAndWriteToDbAsync(page, pcsPerPage);
             if (responce.IsError)
@@ -39,29 +38,29 @@ namespace StarWarsWebApi.Controllers
 
         }
         [HttpGet("{id:int}")]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<ActionResult<Person>> GetById(int id)
         {
             var responce = await _personService.GetByIdWithLocalDbPriorityAsync(id);
             if (responce.IsError)
             {
                 return NotFound(responce.Errors);
             }
-            return Ok(responce.Value);
+            return responce.Value;
 
         }
         
         [HttpGet("/fromLocal/{id:guid}")]
-        public async Task<ActionResult<IList<Person>>> GetPeople(Guid id)
+        public async Task<ActionResult<Person>> GetPeople(Guid id)
         {
             var responce = await _peopleRepository.GetPeopleByIdOrDefault(id);
             if (responce == null)
             {
                 return NotFound();
             }
-            return Ok(responce);
+            return responce;
         }
         [HttpPut("{id:guid}")]
-        public async Task<ActionResult<IList<Person>>> UpdatePeople([FromBody]PersonUpdateModel person,  Guid id)
+        public async Task<ActionResult<Person>> UpdatePeople([FromBody]PersonUpdateModel person,  Guid id)
         {
             var personDbModel = _mapper.Map<PersonUpdateModel, PersonDbModel>(person);
             personDbModel.PrivateId = id;
@@ -70,17 +69,17 @@ namespace StarWarsWebApi.Controllers
             {
                 return NotFound(responce.Errors);
             }
-            return Ok(responce.Value);
+            return _mapper.Map<PersonDbModel, Person>(responce.Value) ;
         }
         [HttpDelete("{id:guid}")]
-        public async Task<ActionResult<IList<Person>>> DeletePeople(Guid id)
+        public async Task<ActionResult> DeletePeople(Guid id)
         {
             var responce = await _peopleRepository.DeletePersonFromDB(id);
             if (responce.IsError)
             {
                 return NotFound(responce.Errors);
             }
-            return Ok(responce.Value);
+            return Ok();
         }
         
         
