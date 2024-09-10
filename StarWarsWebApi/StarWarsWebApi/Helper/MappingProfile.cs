@@ -3,31 +3,20 @@ using StarWarsApiCSharp;
 using StarWarsWebApi.Models;
 
 using StarWarsWebApi.Services;
+using StarWarsWebApi.Utils;
 
 namespace StarWarsWebApi.Helper
 {
  
     public sealed class ExternalIdResolver : IValueResolver<Person, PersonDbModel, int?>
     {
-        private readonly IUrlParcer _urlParcer;
-
-        public ExternalIdResolver(IUrlParcer urlParcer)
-        {
-            _urlParcer = urlParcer;
-        }
 
         public int? Resolve(Person source, PersonDbModel destination, int? destMember, ResolutionContext context)
         {
-            
-            var task = Task.Run(async () =>
-            {
-                var response = await _urlParcer.GetIdFromUrl(source.Url);
-                return response;
-            });
+         
+            var response =  UrlParcer.GetIdFromUrl(source.Url);
 
-            var result = task.Result;
-
-            return result.IsError ? null : result.Value;
+            return response.IsError ? null : response.Value;
         }
     }
 

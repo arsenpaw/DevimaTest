@@ -39,7 +39,6 @@ builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IPeopleRepository, PeopleRepository>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddSingleton<IUrlParcer, UrlParcer>();
 builder.Services.AddScoped<IPersonService, PersonService>();
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 var app = builder.Build();
