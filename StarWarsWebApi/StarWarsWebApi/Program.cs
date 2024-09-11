@@ -1,7 +1,13 @@
 using System.Reflection;
+using System.Security.Claims;
+using System.Text;
 using FluentValidation;
+using Microsoft.AspNetCore.Authentication.BearerToken;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using StarWarsWebApi.Repositories;
@@ -70,12 +76,36 @@ builder.Host.UseSerilog((context, config) =>
 builder.Services.AddDbContext<StarWarsContext>(options =>
    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddIdentityApiEndpoints<IdentityUser>().AddEntityFrameworkStores<StarWarsContext>();
-//builder.Services.AddIdentity<IdentityUser, IdentityRole>()
-   // .AddEntityFrameworkStores<StarWarsContext>()
-//.AddDefaultTokenProviders();
+builder.Services.AddIdentityApiEndpoints<IdentityUser>(opt =>
+    {
+    })
+    .AddRoles<IdentityRole>()
+    .AddEntityFrameworkStores<StarWarsContext>();
 
-
+builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
+    {
+        options.SaveToken = true;
+        options.RequireHttpsMetadata = false;
+        options.TokenValidationParameters = new TokenValidationParameters()
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidAudience = configurationFile["JWT:ValidAudience"],
+            ValidIssuer = configurationFile["JWT:ValidIssuer"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configurationFile["JWT:Secret"]))
+        };
+    });
+builder.Services.AddOptions<BearerTokenOptions>(IdentityConstants.BearerScheme).Configure(options =>
+{
+    var time =Double.Parse(configurationFile["JWT:ExpiryMinutes"]);
+    options.BearerTokenExpiration = TimeSpan.FromSeconds(time);
+});
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IPeopleRepository, PeopleRepository>();
 builder.Services.AddEndpointsApiExplorer();
@@ -98,3 +128,4 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+

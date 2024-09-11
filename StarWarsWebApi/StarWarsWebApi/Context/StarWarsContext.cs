@@ -7,7 +7,7 @@ using StarWarsWebApi.Models;
 
 namespace StarWarsWebApi.Context
 {
-    public class StarWarsContext : IdentityDbContext
+    public class StarWarsContext : IdentityDbContext<IdentityUser>
     {
        
         public DbSet<PersonDbModel> Persons { get; set; }
