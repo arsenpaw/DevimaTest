@@ -1,16 +1,18 @@
 ﻿
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using StarWarsWebApi.Models;
 
 
 namespace StarWarsWebApi.Context
 {
-    public class StarWarsContext : DbContext
+    public class StarWarsContext : IdentityDbContext
     {
        
         public DbSet<PersonDbModel> Persons { get; set; }
 
-        public StarWarsContext(DbContextOptions<StarWarsContext> options) : base(options)
+        public StarWarsContext(DbContextOptions options) : base(options)
         {
 
         }

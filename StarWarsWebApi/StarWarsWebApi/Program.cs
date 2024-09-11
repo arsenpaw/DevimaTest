@@ -2,6 +2,7 @@ using System.Reflection;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using Serilog;
 using StarWarsWebApi.Repositories;
 using StarWarsWebApi.Context;
@@ -24,7 +25,35 @@ var configurationFile = new ConfigurationBuilder()
 
 
 // Add services to the container.
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(opt =>
+{
+    opt.SwaggerDoc("v1", new OpenApiInfo { Title = "MyAPI", Version = "v1" });
+    opt.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        In = ParameterLocation.Header,
+        Description = "Please enter token",
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        BearerFormat = "JWT",
+        Scheme = "bearer"
+    });
 
+    opt.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type=ReferenceType.SecurityScheme,
+                    Id="Bearer"
+                }
+            },
+            new string[]{}
+        }
+    });
+});
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 
@@ -42,7 +71,9 @@ builder.Services.AddDbContext<StarWarsContext>(options =>
    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddIdentityApiEndpoints<IdentityUser>().AddEntityFrameworkStores<StarWarsContext>();
-
+//builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+   // .AddEntityFrameworkStores<StarWarsContext>()
+//.AddDefaultTokenProviders();
 
 
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
@@ -56,7 +87,7 @@ var app = builder.Build();
 
 app.InitializeDatabase();
 
-
+app.MapGroup("/identity").MapIdentityApi<IdentityUser>();
 app.UseSwagger();
 app.UseSwaggerUI();
 
