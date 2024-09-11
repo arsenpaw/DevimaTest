@@ -63,25 +63,21 @@ builder.Services.AddSwaggerGen(opt =>
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 
-
-
 builder.Host.UseSerilog((context, config) =>
 {
     Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "log.txt");
     config
      .ReadFrom.Configuration(configurationFile);
-
-
 });
+
 builder.Services.AddDbContext<StarWarsContext>(options =>
    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddIdentityApiEndpoints<IdentityUser>(opt =>
-    {
-    })
+builder.Services.AddIdentityApiEndpoints<IdentityUser>()
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<StarWarsContext>();
 
+builder.Services.AddScoped<UserManager<IdentityUser>, CustomUserManager<IdentityUser>>();
 builder.Services.AddAuthentication(options =>
     {
         options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -106,6 +102,7 @@ builder.Services.AddOptions<BearerTokenOptions>(IdentityConstants.BearerScheme).
     var time =Double.Parse(configurationFile["JWT:ExpiryMinutes"]);
     options.BearerTokenExpiration = TimeSpan.FromSeconds(time);
 });
+
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IPeopleRepository, PeopleRepository>();
 builder.Services.AddEndpointsApiExplorer();
@@ -116,7 +113,7 @@ builder.Services.AddValidatorsFromAssemblyContaining<IAssemblyMarker>();
 var app = builder.Build();
 
 app.InitializeDatabase();
-
+await app.AddRolesToDb();
 app.MapGroup("/identity").MapIdentityApi<IdentityUser>();
 app.UseSwagger();
 app.UseSwaggerUI();
