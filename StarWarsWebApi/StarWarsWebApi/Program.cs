@@ -1,11 +1,13 @@
 using System.Reflection;
 using FluentValidation;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using StarWarsWebApi.Repositories;
 using StarWarsWebApi.Context;
 using StarWarsApiCSharp;
 using StarWarsWebApi.Common;
+using StarWarsWebApi.Extensions;
 using StarWarsWebApi.Interaces;
 
 using StarWarsWebApi.Helper;
@@ -39,6 +41,9 @@ builder.Host.UseSerilog((context, config) =>
 builder.Services.AddDbContext<StarWarsContext>(options =>
    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddIdentityApiEndpoints<IdentityUser>().AddEntityFrameworkStores<StarWarsContext>();
+
+
 
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IPeopleRepository, PeopleRepository>();
@@ -49,14 +54,7 @@ builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 builder.Services.AddValidatorsFromAssemblyContaining<IAssemblyMarker>();
 var app = builder.Build();
 
-InitializeDatabase(app);
-void InitializeDatabase(IApplicationBuilder app)
-{
-    using (var scope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
-    {
-        scope.ServiceProvider.GetRequiredService<StarWarsContext>().Database.Migrate();
-    }
-}
+app.InitializeDatabase();
 
 
 app.UseSwagger();
