@@ -21,7 +21,6 @@ namespace StarWarsWebApi.Services
             _repository = repository;
             _peopleRepo = peopleRepo;
             _logger = logger;
-
         }
 
         public async Task<ErrorOr<Person>> GetByIdWithLocalDbPriorityAsync(int id)

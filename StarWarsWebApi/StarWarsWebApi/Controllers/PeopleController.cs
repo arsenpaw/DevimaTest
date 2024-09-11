@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StarWarsApiCSharp;
 using StarWarsWebApi.Context;
@@ -10,6 +11,7 @@ using StarWarsWebApi.Models.Dto;
 namespace StarWarsWebApi.Controllers
 {
     [Route("[controller]")]
+    [Authorize]
     [ApiController]
     public class PeopleController : ControllerBase
     {
